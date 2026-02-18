@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 
 const links = [
   { to: '/', label: 'home' },
+  { to: '/blog', label: 'blog' },
   { to: '/about', label: 'about' },
 ]
 
