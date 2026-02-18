@@ -3,28 +3,34 @@ import { useEffect } from 'react'
 import PageTransition from '../components/PageTransition'
 
 // Pre-computed random values so AnimatedGrid is pure
-const ORBS = Array.from({ length: 8 }, () => ({
-  dx: (Math.random() - 0.5) * 200,
-  dy: (Math.random() - 0.5) * 200,
-  duration: 4 + Math.random() * 4,
-  repeatDelay: Math.random() * 6,
-  left: 10 + Math.random() * 80,
-  top: 10 + Math.random() * 80,
+const ACCENT_COLORS = ['var(--color-accent)', 'var(--color-accent-teal)', 'var(--color-accent-warm)', 'var(--color-accent-teal)']
+const BORDER_RADII = ['50%', '50%', '6px', '20px'] // circle, circle, square, pill
+
+const ORBS = Array.from({ length: 14 }, (_, i) => ({
+  dx: (Math.random() - 0.5) * 240,
+  dy: (Math.random() - 0.5) * 240,
+  duration: 5 + Math.random() * 5,
+  repeatDelay: Math.random() * 8,
+  left: 8 + Math.random() * 84,
+  top: 8 + Math.random() * 84,
+  size: [16, 24, 32, 20][i % 4],
+  color: ACCENT_COLORS[i % 4],
+  borderRadius: BORDER_RADII[i % 4],
 }))
 
 function GlowOrb({ x, y }: { x: MotionValue<number>; y: MotionValue<number> }) {
-  const tx = useTransform(x, (v) => v - 300)
-  const ty = useTransform(y, (v) => v - 300)
+  const tx = useTransform(x, (v) => v - 350)
+  const ty = useTransform(y, (v) => v - 350)
   return (
     <motion.div
       style={{
         x: tx,
         y: ty,
         position: 'fixed',
-        width: 600,
-        height: 600,
+        width: 500,
+        height: 500,
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(168,255,120,0.06) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(244,243,242,0.03) 0%, rgba(244,243,242,0.01) 50%, transparent 70%)',
         pointerEvents: 'none',
         zIndex: 0,
       }}
@@ -82,9 +88,8 @@ export default function Home() {
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.8rem',
-                color: 'var(--color-accent)',
                 letterSpacing: '0.15em',
-                textTransform: 'uppercase',
+                color: 'var(--color-text-muted)',
               }}
             >
               {'// hello world'}
@@ -112,7 +117,7 @@ export default function Home() {
             {tags.map((tag) => (
               <motion.span
                 key={tag}
-                whileHover={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                whileHover={{ borderColor: 'var(--color-accent-teal)', color: 'var(--color-accent-teal)' }}
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.75rem',
@@ -138,7 +143,7 @@ export default function Home() {
               href="https://github.com/bkuyk"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.03, borderColor: 'var(--color-accent)' }}
+              whileHover={{ scale: 1.03, borderColor: 'var(--color-accent-teal)' }}
               whileTap={{ scale: 0.97 }}
               style={{
                 fontFamily: 'var(--font-mono)',
@@ -164,13 +169,13 @@ export default function Home() {
 }
 
 function AnimatedGrid() {
-  const size = 32
+  const dotSpacing = 36
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 1, duration: 1.5 }}
+      transition={{ delay: 0.8, duration: 2 }}
       style={{
         position: 'fixed',
         inset: 0,
@@ -179,41 +184,38 @@ function AnimatedGrid() {
         overflow: 'hidden',
       }}
     >
+      {/* Dot grid */}
       <svg
         width="100%"
         height="100%"
-        style={{ position: 'absolute', inset: 0, opacity: 0.25 }}
+        style={{ position: 'absolute', inset: 0, opacity: 0.18 }}
       >
         <defs>
           <pattern
-            id="grid"
-            width={size}
-            height={size}
+            id="dots"
+            width={dotSpacing}
+            height={dotSpacing}
             patternUnits="userSpaceOnUse"
           >
-            <path
-              d={`M ${size} 0 L 0 0 0 ${size}`}
-              fill="none"
-              stroke="var(--color-border)"
-              strokeWidth="0.5"
-            />
+            <circle cx="1" cy="1" r="1" fill="var(--color-accent-warm)" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#grid)" />
+        <rect width="100%" height="100%" fill="url(#dots)" />
       </svg>
 
+      {/* Floating shapes — circles, pills, squares */}
       {ORBS.map((orb, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0 }}
           animate={{
-            opacity: [0, 0.6, 0],
+            opacity: [0, 0.5, 0],
             x: [0, orb.dx],
             y: [0, orb.dy],
           }}
           transition={{
             duration: orb.duration,
-            delay: i * 0.8 + 1.5,
+            delay: i * 0.9 + 1.2,
             repeat: Infinity,
             repeatDelay: orb.repeatDelay,
             ease: 'easeInOut',
@@ -222,11 +224,11 @@ function AnimatedGrid() {
             position: 'absolute',
             left: `${orb.left}%`,
             top: `${orb.top}%`,
-            width: size,
-            height: size,
-            border: '1px solid var(--color-accent)',
-            borderRadius: '2px',
-            boxShadow: '0 0 8px var(--color-accent)',
+            width: orb.borderRadius === '20px' ? orb.size * 2.5 : orb.size,
+            height: orb.size,
+            border: `1px solid ${orb.color}`,
+            borderRadius: orb.borderRadius,
+            boxShadow: `0 0 10px ${orb.color}55`,
           }}
         />
       ))}
