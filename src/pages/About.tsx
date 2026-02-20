@@ -45,11 +45,7 @@ export default function About() {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.8rem',
                 letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                backgroundColor: 'var(--color-accent)',
-                color: 'var(--color-text)',
-                padding: '0.15rem 0.5rem',
-                borderRadius: '3px',
+                color: 'var(--color-text-muted)',
               }}
             >
               {'// about'}
